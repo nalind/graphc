@@ -5,7 +5,7 @@ package main
 import (
 	"os"
 
-	_ "github.com/willmtemple/graphc/graphdriver/windows"
+	_ "github.com/docker/docker/daemon/graphdriver/windows"
 )
 
 var (

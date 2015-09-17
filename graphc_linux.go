@@ -3,11 +3,12 @@
 package main
 
 import (
-	_ "github.com/willmtemple/graphc/graphdriver/aufs"
-	_ "github.com/willmtemple/graphc/graphdriver/btrfs"
-	_ "github.com/willmtemple/graphc/graphdriver/devmapper"
-	_ "github.com/willmtemple/graphc/graphdriver/overlay"
-	_ "github.com/willmtemple/graphc/graphdriver/zfs"
+	_ "github.com/docker/docker/daemon/graphdriver/aufs"
+	_ "github.com/docker/docker/daemon/graphdriver/btrfs"
+	_ "github.com/docker/docker/daemon/graphdriver/devmapper"
+	_ "github.com/docker/docker/daemon/graphdriver/overlay"
+	_ "github.com/docker/docker/daemon/graphdriver/vfs"
+	_ "github.com/docker/docker/daemon/graphdriver/zfs"
 )
 
 var (

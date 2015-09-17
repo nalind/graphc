@@ -3,7 +3,7 @@
 package main
 
 import (
-	_ "github.com/willmtemple/graphc/graphdriver/zfs"
+	_ "github.com/docker/docker/daemon/graphdriver/zfs"
 )
 
 var (

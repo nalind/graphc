@@ -5,9 +5,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/willmtemple/graphc/graphdriver"
-
-	_ "github.com/willmtemple/graphc/graphdriver/vfs"
+	"github.com/docker/docker/daemon/graphdriver"
 )
 
 func initDriver(c *cli.Context) graphdriver.Driver {
@@ -94,9 +92,9 @@ func main() {
 	graphc.EnableBashCompletion = true
 	graphc.Commands = []cli.Command{
 		{
-			Name:    "create",
-			Aliases: []string{"c"},
-			Usage:   "create a new storage for id",
+			Name:      "create",
+			ShortName: "c",
+			Usage:     "create a new storage for id",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "parent, p",
@@ -107,28 +105,27 @@ func main() {
 			Action: create,
 		},
 		{
-			Name:    "remove",
-			Aliases: []string{"r"},
-			Usage:   "remove storage for id",
-			Action:  remove,
+			Name:      "remove",
+			ShortName: "r",
+			Usage:     "remove storage for id",
+			Action:    remove,
 		},
 		{
-			Name:    "get",
-			Aliases: []string{"g"},
-			Usage:   "mount an image to the filesystem",
-			Action:  get,
+			Name:      "get",
+			ShortName: "g",
+			Usage:     "mount an image to the filesystem",
+			Action:    get,
 		},
 		{
-			Name:    "put",
-			Aliases: []string{"p"},
-			Usage:   "unmount an image from the filesystem",
-			Action:  put,
+			Name:      "put",
+			ShortName: "p",
+			Usage:     "unmount an image from the filesystem",
+			Action:    put,
 		},
 		{
-			Name:    "clean",
-			Aliases: []string{},
-			Usage:   "clean up stateful artifacts",
-			Action:  clean,
+			Name:   "clean",
+			Usage:  "clean up stateful artifacts",
+			Action: clean,
 		},
 	}
 
