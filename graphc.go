@@ -66,7 +66,6 @@ func clean(c *cli.Context) {
 }
 
 func main() {
-
 	graphc := cli.NewApp()
 	graphc.Name = "graphc"
 	graphc.Usage = "manage graphc storage"
@@ -130,5 +129,4 @@ func main() {
 	}
 
 	graphc.Run(os.Args)
-
 }
