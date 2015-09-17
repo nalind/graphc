@@ -1,12 +1,15 @@
 ## graphc
-### A utility for managing docker storage backends
 
-####*Installation:*
-`go get github.com/willmtemple/graphc`
+### A utility for managing docker layers and layer storage
 
-This will build the binary and place it in `${GOPATH}/bin`. Alternatively, you
-might check-out the sources with git and manually build the program using `go
-build`.
+####*Building:*
+`go get github.com/codegangsta/cli`
+`go get github.com/docker/docker/daemon/graphdriver`
+`go get github.com/mistifyio/go-zfs`
+`go get github.com/opencontainers/runc/libcontainer/label`
+`go build -tags daemon`
+
+This will build the binary in the current directory.
 
 ####*Invocation:*
 `graphc --help`
