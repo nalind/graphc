@@ -12,7 +12,7 @@ import (
 func initDriver(c *cli.Context) graphdriver.Driver {
 	graphdriver.DefaultDriver = c.GlobalString("driver")
 	homedir := c.GlobalString("home")
-	drv, err := graphdriver.New(homedir, []string{})
+	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"))
 	if err != nil {
 		fmt.Printf("Failed to instantiate graphdriver: %s\n", err)
 		os.Exit(1)
@@ -48,8 +48,14 @@ func main() {
 		cli.StringFlag{
 			Name:   "driver, s",
 			Value:  "",
-			Usage:  "storage backend to use",
+			Usage:  "storage driver to use",
 			EnvVar: "GRAPHDRIVER_BACKEND",
+		},
+		cli.StringSliceFlag{
+			Name:   "storage-opt",
+			Value:  &cli.StringSlice{},
+			Usage:  "set storage driver options",
+			EnvVar: "GRAPHDRIVER_OPTIONS",
 		},
 		cli.StringFlag{
 			Name:  "context, c",
