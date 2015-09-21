@@ -23,7 +23,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 	return drv
 }
 
-func initGraph(c *cli.Context) *graph.Graph {
+func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 	drv := initDriver(c)
 	homedir := c.GlobalString("home") + "/graph/"
 	g, err := graph.NewGraph(homedir, drv)
@@ -31,7 +31,21 @@ func initGraph(c *cli.Context) *graph.Graph {
 		fmt.Printf("Failed to instantiate graph: %s\n", err)
 		os.Exit(1)
 	}
-	return g
+	return g, drv
+}
+
+func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
+	g, d := initGraph(c)
+	homedir := c.GlobalString("home") + "/graph/"
+	config := graph.TagStoreConfig{
+		Graph: g,
+	}
+	t, err := graph.NewTagStore(homedir, &config)
+	if err != nil {
+		fmt.Printf("Failed to instantiate tag store: %s\n", err)
+		os.Exit(1)
+	}
+	return t, g, d
 }
 
 var commands []cli.Command

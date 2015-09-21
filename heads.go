@@ -8,7 +8,7 @@ import (
 )
 
 func imageHeads(c *cli.Context) {
-	graph := initGraph(c)
+	graph, _ := initGraph(c)
 	heads := graph.Heads()
 	if heads == nil {
 		fmt.Printf("Failed to read heads list\n")

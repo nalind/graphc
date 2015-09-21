@@ -8,7 +8,7 @@ import (
 )
 
 func jsonImage(c *cli.Context) {
-	graph := initGraph(c)
+	graph, _ := initGraph(c)
 	id := c.Args().First()
 	b, err := graph.RawJSON(id)
 	if err != nil {

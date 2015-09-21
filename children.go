@@ -8,7 +8,7 @@ import (
 )
 
 func imageChildren(c *cli.Context) {
-	graph := initGraph(c)
+	graph, _ := initGraph(c)
 	id := c.Args().First()
 	m := graph.ByParent()
 	if m == nil {

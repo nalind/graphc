@@ -9,7 +9,7 @@ import (
 )
 
 func tarImage(c *cli.Context) {
-	graph := initGraph(c)
+	graph, _ := initGraph(c)
 	id := c.Args().First()
 	image, err := graph.Get(id)
 	if image == nil || err != nil {
