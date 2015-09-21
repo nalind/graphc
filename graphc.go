@@ -17,7 +17,9 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 		fmt.Printf("Failed to instantiate graphdriver: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("[DEBUG] Using driver %s.\n%g\nHome directory: %s\n", drv.String(), drv.Status(), homedir)
+	if c.GlobalBool("debug") {
+		fmt.Printf("[DEBUG] Using driver %s.\n[DEBUG] %g\n[DEBUG] Home directory: %s\n", drv.String(), drv.Status(), homedir)
+	}
 	return drv
 }
 
@@ -61,6 +63,10 @@ func main() {
 			Name:  "context, c",
 			Value: "",
 			Usage: "optional mountlabel (SELinux context)",
+		},
+		cli.BoolFlag{
+			Name:  "debug, D",
+			Usage: "print debugging information",
 		},
 	}
 	graphc.EnableBashCompletion = true
