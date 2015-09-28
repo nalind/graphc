@@ -36,11 +36,11 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 
 func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
 	g, d := initGraph(c)
-	homedir := c.GlobalString("home") + "/graph/"
+	tsfile := c.GlobalString("home") + "/repositories-" + c.GlobalString("driver")
 	config := graph.TagStoreConfig{
 		Graph: g,
 	}
-	t, err := graph.NewTagStore(homedir, &config)
+	t, err := graph.NewTagStore(tsfile, &config)
 	if err != nil {
 		fmt.Printf("Failed to instantiate tag store: %s\n", err)
 		os.Exit(1)
@@ -87,4 +87,6 @@ func main() {
 	graphc.Commands = commands
 
 	graphc.Run(os.Args)
+
+	os.Exit(0)
 }
