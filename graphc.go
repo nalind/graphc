@@ -11,6 +11,10 @@ import (
 
 func initDriver(c *cli.Context) graphdriver.Driver {
 	graphdriver.DefaultDriver = c.GlobalString("driver")
+	if graphdriver.DefaultDriver == "" {
+		fmt.Printf("No graphdriver specified.\n")
+		os.Exit(1)
+	}
 	homedir := c.GlobalString("home")
 	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"))
 	if err != nil {
