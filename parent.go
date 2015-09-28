@@ -8,9 +8,9 @@ import (
 )
 
 func imageParent(c *cli.Context) {
-	graph, _ := initGraph(c)
+	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	image, err := graph.Get(id)
+	image, err := ts.LookupImage(id)
 	if err != nil {
 		fmt.Printf("Failed to read image %s: %v\n", id, err)
 		os.Exit(1)

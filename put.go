@@ -8,9 +8,14 @@ import (
 )
 
 func put(c *cli.Context) {
-	driver := initDriver(c)
+	ts, _, driver := initTagStore(c)
 	id := c.Args().First()
-	if err := driver.Put(id); err != nil {
+	image, err := ts.LookupImage(id)
+	if err != nil {
+		fmt.Printf("Failed to locate image %s: %s\n", id, err)
+		os.Exit(1)
+	}
+	if err := driver.Put(image.ID); err != nil {
 		fmt.Printf("Failed to Put %s: %s\n", id, err)
 		os.Exit(1)
 	}

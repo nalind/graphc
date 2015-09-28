@@ -8,11 +8,15 @@ import (
 )
 
 func imageChildren(c *cli.Context) {
-	graph, _ := initGraph(c)
+	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
+	image, _ := ts.LookupImage(id)
+	if image != nil {
+		id = image.ID
+	}
 	m := graph.ByParent()
 	if m == nil {
-		fmt.Printf("Failed to map of images\n")
+		fmt.Printf("Failed to read map of images\n")
 		os.Exit(1)
 	}
 	images, found := m[id]

@@ -8,9 +8,14 @@ import (
 )
 
 func get(c *cli.Context) {
-	driver := initDriver(c)
+	ts, _, driver := initTagStore(c)
 	id := c.Args().First()
-	loc, err := driver.Get(id, c.GlobalString("context"))
+	image, err := ts.LookupImage(id)
+	if err != nil {
+		fmt.Printf("Failed to locate image %s: %s\n", id, err)
+		os.Exit(1)
+	}
+	loc, err := driver.Get(image.ID, c.GlobalString("context"))
 	if err != nil {
 		fmt.Printf("Failed to Get %s: %s\n", id, err)
 		os.Exit(1)

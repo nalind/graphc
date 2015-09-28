@@ -9,9 +9,9 @@ import (
 )
 
 func tarImage(c *cli.Context) {
-	graph, _ := initGraph(c)
+	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	image, err := graph.Get(id)
+	image, err := ts.LookupImage(id)
 	if image == nil || err != nil {
 		if err != nil {
 			fmt.Printf("Failed to find image layer %s: %v\n", id, err)

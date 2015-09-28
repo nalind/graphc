@@ -8,9 +8,14 @@ import (
 )
 
 func jsonImage(c *cli.Context) {
-	graph, _ := initGraph(c)
+	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	b, err := graph.RawJSON(id)
+	image, err := ts.LookupImage(id)
+	if err != nil {
+		fmt.Printf("Failed to locate image %s: %s\n", id, err)
+		os.Exit(1)
+	}
+	b, err := graph.RawJSON(image.ID)
 	if err != nil {
 		fmt.Printf("Failed to obtain a JSON representation of image %s: %s\n", id, err)
 		os.Exit(1)
