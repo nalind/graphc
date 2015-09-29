@@ -17,15 +17,15 @@ func listLayer(img *image.Image, tags *map[string][]string) {
 		if taglist, ok := (*tags)[img.ID]; ok {
 			for i, tag := range taglist {
 				if i > 0 {
-					fmt.Printf(",");
+					fmt.Printf(",")
 				} else {
-					fmt.Printf("\t");
+					fmt.Printf("\t")
 				}
-				fmt.Printf("%s", tag);
+				fmt.Printf("%s", tag)
 			}
 		}
 	}
-	fmt.Printf("\n");
+	fmt.Printf("\n")
 }
 
 func initDriver(c *cli.Context) graphdriver.Driver {

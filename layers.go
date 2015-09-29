@@ -27,15 +27,15 @@ func listLayers(c *cli.Context) {
 	}
 	ids := ts.ByID()
 	for n, _ := range images {
-		img = images[len(images) - n - 1]
+		img = images[len(images)-n-1]
 		listLayer(img, &ids)
 	}
 }
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:  "layers",
-		Usage: "list layers in an image",
+		Name:   "layers",
+		Usage:  "list layers in an image",
 		Action: listLayers,
 	})
 }
