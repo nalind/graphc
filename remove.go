@@ -8,17 +8,18 @@ import (
 )
 
 func remove(c *cli.Context) {
-	graph, driver := initGraph(c)
+	ts, _, driver := initTagStore(c)
 	id := c.Args().First()
 	if id == "" {
 		fmt.Printf("No image specified.\n")
 		os.Exit(1)
 	}
-	if !graph.Exists(id) {
-		fmt.Printf("No image named %s exists.\n", id)
+	image, err := ts.LookupImage(id)
+	if err != nil {
+		fmt.Printf("Error locating image %s: %s.\n", id, err)
 		os.Exit(1)
 	}
-	if err := driver.Remove(id); err != nil {
+	if err := driver.Remove(image.ID); err != nil {
 		fmt.Printf("Failed to remove %s: %s\n", id, err)
 		os.Exit(1)
 	}
