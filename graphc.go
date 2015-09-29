@@ -54,6 +54,9 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 		fmt.Printf("Failed to instantiate graph: %s\n", err)
 		os.Exit(1)
 	}
+	if c.GlobalBool("debug") {
+		fmt.Printf("[DEBUG] %d images.\n", len(g.Map()))
+	}
 	return g, drv
 }
 
