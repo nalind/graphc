@@ -8,7 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func tarImage(c *cli.Context) {
+func tarLayer(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
 	image, err := ts.LookupImage(id)
@@ -49,7 +49,7 @@ func tarImage(c *cli.Context) {
 func init() {
 	commands = append(commands, cli.Command{
 		Name:  "tar",
-		Usage: "produce an image tarball",
+		Usage: "produce a layer tarball",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "output, o",
@@ -57,6 +57,6 @@ func init() {
 				Usage: "an output file",
 			},
 		},
-		Action: tarImage,
+		Action: tarLayer,
 	})
 }

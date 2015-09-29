@@ -39,8 +39,8 @@ func jsonImage(c *cli.Context) {
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:  "json-image",
-		Usage: "export an image as JSON",
+		Name:  "json",
+		Usage: "export an image configuration as JSON",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "output, o",
