@@ -28,18 +28,7 @@ func listLayers(c *cli.Context) {
 	ids := ts.ByID()
 	for n, _ := range images {
 		img = images[len(images) - n - 1]
-		fmt.Printf("%s", img.ID[:12])
-		if nicks, ok := ids[img.ID]; ok {
-			for i, nick := range nicks {
-				if i > 0 {
-					fmt.Printf(",");
-				} else {
-					fmt.Printf("\t");
-				}
-				fmt.Printf("%s", nick);
-			}
-		}
-		fmt.Printf("\n");
+		listLayer(img, &ids)
 	}
 }
 

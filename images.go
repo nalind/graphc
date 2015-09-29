@@ -16,18 +16,12 @@ func listImages(c *cli.Context) {
 		os.Exit(1)
 	}
 	for _, image := range images {
-		fmt.Printf("%s", image.ID[:12])
-		if nicks, ok := ids[image.ID]; ok {
-			for i, nick := range nicks {
-				if i > 0 {
-					fmt.Printf(",");
-				} else {
-					fmt.Printf("\t");
-				}
-				fmt.Printf("%s", nick);
-			}
+		img, err := ts.LookupImage(image.ID)
+		if err != nil {
+			fmt.Printf("Error locating image %s: %s\n", image.ID, err)
+			os.Exit(1)
 		}
-		fmt.Printf("\n");
+		listLayer(img, &ids)
 	}
 }
 

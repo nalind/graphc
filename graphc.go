@@ -7,7 +7,25 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
+	"github.com/docker/docker/image"
 )
+
+func listLayer(img *image.Image, tags *map[string][]string) {
+	fmt.Printf("%s", img.ID[:12])
+	if tags != nil {
+		if taglist, ok := (*tags)[img.ID]; ok {
+			for i, tag := range taglist {
+				if i > 0 {
+					fmt.Printf(",");
+				} else {
+					fmt.Printf("\t");
+				}
+				fmt.Printf("%s", tag);
+			}
+		}
+	}
+	fmt.Printf("\n");
+}
 
 func initDriver(c *cli.Context) graphdriver.Driver {
 	graphdriver.DefaultDriver = c.GlobalString("driver")

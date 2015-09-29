@@ -26,18 +26,7 @@ func imageChildren(c *cli.Context) {
 	}
 	ids := ts.ByID()
 	for _, image := range images {
-		fmt.Printf("%s", image.ID[:12])
-		if nicks, ok := ids[image.ID]; ok {
-			for i, nick := range nicks {
-				if i > 0 {
-					fmt.Printf(",");
-				} else {
-					fmt.Printf("\t");
-				}
-				fmt.Printf("%s", nick);
-			}
-		}
-		fmt.Printf("\n");
+		listLayer(image, &ids)
 	}
 }
 
