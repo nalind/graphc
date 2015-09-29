@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/codegangsta/cli"
 	"github.com/docker/docker/daemon/graphdriver"
@@ -33,7 +34,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 		fmt.Printf("No graphdriver specified.\n")
 		os.Exit(1)
 	}
-	homedir := c.GlobalString("home")
+	homedir := filepath.Join(c.GlobalString("home"))
 	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"))
 	if err != nil {
 		fmt.Printf("Failed to instantiate graphdriver: %s\n", err)
@@ -47,7 +48,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 
 func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 	drv := initDriver(c)
-	homedir := c.GlobalString("home") + "/graph/"
+	homedir := filepath.Join(c.GlobalString("home"), "graph")
 	g, err := graph.NewGraph(homedir, drv)
 	if err != nil {
 		fmt.Printf("Failed to instantiate graph: %s\n", err)
@@ -58,7 +59,7 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 
 func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
 	g, d := initGraph(c)
-	tsfile := c.GlobalString("home") + "/repositories-" + c.GlobalString("driver")
+	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+c.GlobalString("driver"))
 	config := graph.TagStoreConfig{
 		Graph: g,
 	}
