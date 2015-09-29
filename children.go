@@ -24,8 +24,20 @@ func imageChildren(c *cli.Context) {
 		fmt.Printf("No child images for %s\n", id)
 		os.Exit(1)
 	}
+	ids := ts.ByID()
 	for _, image := range images {
-		fmt.Printf("%s\n", image.ID)
+		fmt.Printf("%s", image.ID[:12])
+		if nicks, ok := ids[image.ID]; ok {
+			for i, nick := range nicks {
+				if i > 0 {
+					fmt.Printf(",");
+				} else {
+					fmt.Printf("\t");
+				}
+				fmt.Printf("%s", nick);
+			}
+		}
+		fmt.Printf("\n");
 	}
 }
 
