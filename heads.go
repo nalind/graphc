@@ -8,14 +8,15 @@ import (
 )
 
 func imageHeads(c *cli.Context) {
-	graph, _ := initGraph(c)
+	ts, graph, _ := initTagStore(c)
 	heads := graph.Heads()
 	if heads == nil {
 		fmt.Printf("Failed to read heads list\n")
 		os.Exit(1)
 	}
-	for id, _ := range heads {
-		fmt.Printf("%s\n", id)
+	ids := ts.ByID()
+	for _, img := range heads {
+		listLayer(img, &ids)
 	}
 }
 
