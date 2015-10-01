@@ -3,13 +3,8 @@
 ### A utility for managing docker layers and layer storage
 
 ####*Building:*
- `go get -d -n -u github.com/docker/docker/daemon/graphdriver github.com/docker/docker/graph`
- `( cd ``echo $GOPATH | cut -f1 -d:``/src/github.com/docker/docker ; env GOPATH=``pwd``/vendor:"$GOPATH" sh hack/make.sh dynbinary )`
- `go get -u github.com/codegangsta/cli github.com/mistifyio/go-zfs github.com/opencontainers/runc/libcontainer/label`
- `go get -u github.com/tchap/go-patricia/patricia github.com/vbatts/tar-split/tar/asm github.com/vbatts/tar-split/tar/storage`
- `go build -tags daemon`
-
-This will build the binary in the current directory.
+ The makefile should be set up so that running `make` will be sufficient to
+ produce a graphc binary in the current directory.
 
 ####*Invocation:*
 `graphc --help`
