@@ -10,7 +10,8 @@
 `graphc --help`
 
 The program has subcommands which are analogues of the public `Driver` API in
-Docker's `graphdriver`.
+Docker's `daemon/graphdriver` subdirectory and the `Graph` and `TagStore` APIs
+in Docker's `graph` subdirectory.
 
 ######Disclaimer:
 > *This program is strictly a work-in-progress.  It directly accesses data
