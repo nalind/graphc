@@ -5,14 +5,12 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/docker/docker/context"
 	"github.com/docker/docker/pkg/parsers"
 	"github.com/docker/docker/runconfig"
 )
 
 func importImage(c *cli.Context) {
 	ts, _, _ := initTagStore(c)
-	ctx := context.Context{}
 	infile := os.Stdin
 	src := c.String("input")
 	if src == "" {
@@ -30,7 +28,7 @@ func importImage(c *cli.Context) {
 	}
 	msg := c.String("message")
 	runconfig := &runconfig.Config{}
-	err := ts.Import(ctx, src, repo, tag, msg, infile, nil, runconfig)
+	err := ts.Import(src, repo, tag, msg, infile, nil, runconfig)
 	if err != nil {
 		fmt.Printf("Error writing JSON to output: %s\n", err)
 		os.Exit(1)
