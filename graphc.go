@@ -36,7 +36,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 		os.Exit(1)
 	}
 	homedir := c.GlobalString("home")
-	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"))
+	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"), nil, nil)
 	if err != nil {
 		fmt.Printf("Failed to instantiate graphdriver: %s\n", err)
 		os.Exit(1)
@@ -50,7 +50,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 	drv := initDriver(c)
 	homedir := filepath.Join(c.GlobalString("home"), "graph")
-	g, err := graph.NewGraph(homedir, drv)
+	g, err := graph.NewGraph(homedir, drv, nil, nil)
 	if err != nil {
 		fmt.Printf("Failed to instantiate graph: %s\n", err)
 		os.Exit(1)
