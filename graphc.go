@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/codegangsta/cli"
+	"github.com/docker/docker/daemon/events"
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
 	"github.com/docker/docker/image"
@@ -65,7 +66,9 @@ func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Dr
 	g, d := initGraph(c)
 	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+d.String())
 	r := registry.NewService(nil)
+	e := events.New()
 	config := graph.TagStoreConfig{
+		Events:   e,
 		Graph:    g,
 		Registry: r,
 	}
