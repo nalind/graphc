@@ -9,6 +9,7 @@ import (
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
 	"github.com/docker/docker/image"
+	"github.com/docker/docker/registry"
 )
 
 func listLayer(img *image.Image, tags *map[string][]string) {
@@ -34,7 +35,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 		fmt.Printf("No graphdriver specified.\n")
 		os.Exit(1)
 	}
-	homedir := filepath.Join(c.GlobalString("home"))
+	homedir := c.GlobalString("home")
 	drv, err := graphdriver.New(homedir, c.GlobalStringSlice("storage-opt"))
 	if err != nil {
 		fmt.Printf("Failed to instantiate graphdriver: %s\n", err)
@@ -62,9 +63,11 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 
 func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
 	g, d := initGraph(c)
-	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+c.GlobalString("driver"))
+	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+d.String())
+	r := registry.NewService(nil)
 	config := graph.TagStoreConfig{
-		Graph: g,
+		Graph:    g,
+		Registry: r,
 	}
 	t, err := graph.NewTagStore(tsfile, &config)
 	if err != nil {
