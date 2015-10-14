@@ -10,6 +10,8 @@ import (
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
 	"github.com/docker/docker/image"
+	_ "github.com/docker/docker/pkg/chrootarchive"
+	"github.com/docker/docker/pkg/reexec"
 	"github.com/docker/docker/registry"
 )
 
@@ -83,6 +85,9 @@ func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Dr
 var commands []cli.Command
 
 func main() {
+	if reexec.Init() {
+		return
+	}
 	graphc := cli.NewApp()
 	graphc.Name = "graphc"
 	graphc.Usage = "manage graphc storage"
