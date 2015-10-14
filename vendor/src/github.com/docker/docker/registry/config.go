@@ -330,6 +330,7 @@ func (config *ServiceConfig) NewRepositoryInfo(reposName string, bySearch bool) 
 			normalizedName = strings.SplitN(normalizedName, "/", 2)[1]
 		}
 
+		repoInfo.LocalName = normalizedName
 		repoInfo.RemoteName = normalizedName
 		// If the normalized name does not contain a '/' (e.g. "foo")
 		// then it is an official repo.
@@ -340,7 +341,6 @@ func (config *ServiceConfig) NewRepositoryInfo(reposName string, bySearch bool) 
 		}
 
 		repoInfo.CanonicalName = "docker.io/" + repoInfo.RemoteName
-		repoInfo.LocalName = repoInfo.Index.Name + "/" + normalizedName
 	} else {
 		repoInfo.LocalName = repoInfo.Index.Name + "/" + repoInfo.RemoteName
 		repoInfo.CanonicalName = repoInfo.LocalName
