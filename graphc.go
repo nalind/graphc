@@ -64,11 +64,15 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 	return g, drv
 }
 
+func initRegistry() *registry.Service {
+	return registry.NewService(nil)
+}
+
 func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
 	g, d := initGraph(c)
 	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+d.String())
-	r := registry.NewService(nil)
 	e := events.New()
+	r := initRegistry()
 	config := graph.TagStoreConfig{
 		Events:   e,
 		Graph:    g,
