@@ -103,7 +103,7 @@ func main() {
 			EnvVar: "GRAPHDRIVER_HOME",
 		},
 		cli.StringFlag{
-			Name:   "driver, s",
+			Name:   "storage-driver, driver, s",
 			Value:  "",
 			Usage:  "storage driver to use",
 			EnvVar: "GRAPHDRIVER_BACKEND",
