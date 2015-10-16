@@ -45,7 +45,7 @@ func initDriver(c *cli.Context) graphdriver.Driver {
 		os.Exit(1)
 	}
 	if c.GlobalBool("debug") {
-		fmt.Printf("[DEBUG] Using driver %s.\n[DEBUG] %g\n[DEBUG] Home directory: %s\n", drv.String(), drv.Status(), homedir)
+		fmt.Fprintf(os.Stderr, "[DEBUG] Using driver %s.\n[DEBUG] %g\n[DEBUG] Home directory: %s\n", drv.String(), drv.Status(), homedir)
 	}
 	return drv
 }
@@ -59,7 +59,7 @@ func initGraph(c *cli.Context) (*graph.Graph, graphdriver.Driver) {
 		os.Exit(1)
 	}
 	if c.GlobalBool("debug") {
-		fmt.Printf("[DEBUG] %d images.\n", len(g.Map()))
+		fmt.Fprintf(os.Stderr, "[DEBUG] %d images.\n", len(g.Map()))
 	}
 	return g, drv
 }
