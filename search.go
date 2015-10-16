@@ -47,10 +47,10 @@ func searchImages(c *cli.Context) {
 			trusted = '✅'
 		}
 		stars := fmt.Sprintf("%d", result.StarCount)
-		stars = stars + strings.Repeat(" ", maxcount - len(stars))
+		stars = stars + strings.Repeat(" ", maxcount-len(stars))
 		name := strings.Replace(result.Name, "\n", " ", -1)
 		name = strings.Trim(name, "\r\n\t ")
-		name = name + strings.Repeat(" ", maxname - len(name))
+		name = name + strings.Repeat(" ", maxname-len(name))
 		description := strings.Replace(result.Description, "\n", " ", -1)
 		description = strings.Trim(description, "\r\n\t ")
 		fmt.Printf("%c %c %c %s%s %s\n", official, trusted, automated, stars, name, description)
