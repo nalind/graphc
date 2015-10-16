@@ -18,7 +18,14 @@ func exportImage(c *cli.Context) {
 		}
 		outfile = newfile
 	}
-	err := ts.ImageExport(c.Args(), outfile)
+	images := []string{}
+	for _, arg := range c.Args() {
+		id := lookupID(ts, arg)
+		if id != "" {
+			images = append(images, id)
+		}
+	}
+	err := ts.ImageExport(images, outfile)
 	if err != nil {
 		fmt.Printf("Error exporting: %s\n", err)
 		os.Exit(1)

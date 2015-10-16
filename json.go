@@ -10,7 +10,7 @@ import (
 func jsonImage(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	image, err := ts.LookupImage(id)
+	image, err := lookupImage(ts, id)
 	if err != nil {
 		fmt.Printf("Failed to locate image %s: %s\n", id, err)
 		os.Exit(1)

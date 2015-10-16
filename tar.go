@@ -11,7 +11,7 @@ import (
 func tarLayer(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	image, err := ts.LookupImage(id)
+	image, err := lookupImage(ts, id)
 	if image == nil || err != nil {
 		if err != nil {
 			fmt.Printf("Failed to find image layer %s: %v\n", id, err)

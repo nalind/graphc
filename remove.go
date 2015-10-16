@@ -14,7 +14,7 @@ func remove(c *cli.Context) {
 		fmt.Printf("No image specified.\n")
 		os.Exit(1)
 	}
-	image, err := ts.LookupImage(id)
+	image, err := lookupImage(ts, id)
 	if err != nil {
 		fmt.Printf("Error locating image %s: %s.\n", id, err)
 		os.Exit(1)

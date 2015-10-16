@@ -11,7 +11,7 @@ import (
 func listLayers(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	img, err := ts.LookupImage(id)
+	img, err := lookupImage(ts, id)
 	if err != nil {
 		fmt.Printf("Error locating image: %s\n", err)
 		os.Exit(1)

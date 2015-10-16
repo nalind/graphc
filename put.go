@@ -10,7 +10,7 @@ import (
 func put(c *cli.Context) {
 	ts, _, driver := initTagStore(c)
 	id := c.Args().First()
-	image, err := ts.LookupImage(id)
+	image, err := lookupImage(ts, id)
 	if err != nil {
 		fmt.Printf("Failed to locate image %s: %s\n", id, err)
 		os.Exit(1)

@@ -11,7 +11,7 @@ import (
 func inspectImage(c *cli.Context) {
 	ts, _, _ := initTagStore(c)
 	id := c.Args().First()
-	idata, err := ts.Lookup(id)
+	idata, err := lookup(ts, id)
 	if err != nil {
 		fmt.Printf("Failed to locate image %s: %s\n", id, err)
 		os.Exit(1)

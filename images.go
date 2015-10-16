@@ -16,7 +16,7 @@ func listImages(c *cli.Context) {
 		os.Exit(1)
 	}
 	for _, image := range images {
-		img, err := ts.LookupImage(image.ID)
+		img, err := lookupImage(ts, image.ID)
 		if err != nil {
 			fmt.Printf("Error locating image %s: %s\n", image.ID, err)
 			os.Exit(1)

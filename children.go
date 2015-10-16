@@ -10,7 +10,7 @@ import (
 func imageChildren(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
-	image, _ := ts.LookupImage(id)
+	image, _ := lookupImage(ts, id)
 	if image != nil {
 		id = image.ID
 	}

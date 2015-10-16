@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/daemon/events"
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
 	"github.com/docker/docker/image"
 	_ "github.com/docker/docker/pkg/chrootarchive"
+	"github.com/docker/docker/pkg/parsers"
 	"github.com/docker/docker/pkg/reexec"
 	"github.com/docker/docker/registry"
 )
@@ -84,6 +87,64 @@ func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Dr
 		os.Exit(1)
 	}
 	return t, g, d
+}
+
+func lookupID(s *graph.TagStore, name string) string {
+	s.Lock()
+	defer s.Unlock()
+	repo, tag := parsers.ParseRepositoryTag(name)
+	if r, exists := s.Repositories[repo]; exists {
+		if tag == "" {
+			tag = "latest"
+		}
+		if id, exists := r[tag]; exists {
+			return id
+		}
+	}
+	if r, exists := s.Repositories[registry.IndexName+"/"+repo]; exists {
+		if tag == "" {
+			tag = "latest"
+		}
+		if id, exists := r[tag]; exists {
+			return id
+		}
+	}
+	names := strings.Split(name, "/")
+	if len(names) > 1 {
+		if r, exists := s.Repositories[strings.Join(names[1:], "/")]; exists {
+			if tag == "" {
+				tag = "latest"
+			}
+			if id, exists := r[tag]; exists {
+				return id
+			}
+		}
+	}
+	return ""
+}
+
+func lookup(s *graph.TagStore, name string) (*types.ImageInspect, error) {
+	img, err := s.Lookup(name)
+	if img != nil {
+		return img, err
+	}
+	id := lookupID(s, name)
+	if id != "" {
+		return s.Lookup(id)
+	}
+	return nil, err
+}
+
+func lookupImage(s *graph.TagStore, name string) (*image.Image, error) {
+	img, err := s.LookupImage(name)
+	if img != nil {
+		return img, err
+	}
+	id := lookupID(s, name)
+	if id != "" {
+		return s.LookupImage(id)
+	}
+	return nil, err
 }
 
 var commands []cli.Command
