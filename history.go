@@ -8,7 +8,7 @@ import (
 	"github.com/docker/docker/image"
 )
 
-func listLayers(c *cli.Context) {
+func imageHistory(c *cli.Context) {
 	ts, graph, _ := initTagStore(c)
 	id := c.Args().First()
 	img, err := lookupImage(ts, id)
@@ -16,9 +16,9 @@ func listLayers(c *cli.Context) {
 		fmt.Printf("Error locating image: %s\n", err)
 		os.Exit(1)
 	}
-	images := []*image.Image{}
+	images := []string{}
 	err = graph.WalkHistory(img, func(img image.Image) error {
-		images = append(images, &img)
+		images = append([]string{img.ID}, images...)
 		return nil
 	})
 	if err != nil {
@@ -26,16 +26,20 @@ func listLayers(c *cli.Context) {
 		os.Exit(1)
 	}
 	ids := ts.ByID()
-	for n, _ := range images {
-		img = images[len(images)-n-1]
+	for _, image := range images {
+		img, err := lookupImage(ts, image)
+		if err != nil {
+			fmt.Printf("Error reading image %s: %s\n", image, err)
+			os.Exit(1)
+		}
 		listLayer(img, &ids)
 	}
 }
 
 func init() {
 	commands = append(commands, cli.Command{
-		Name:   "layers",
+		Name:   "history",
 		Usage:  "list layers in an image",
-		Action: listLayers,
+		Action: imageHistory,
 	})
 }
