@@ -7,8 +7,8 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func remove(c *cli.Context) {
-	ts, _, driver := initTagStore(c)
+func deleteImage(c *cli.Context) {
+	ts, g, _ := initTagStore(c)
 	id := c.Args().First()
 	if id == "" {
 		fmt.Printf("No image specified.\n")
@@ -19,8 +19,8 @@ func remove(c *cli.Context) {
 		fmt.Printf("Error locating image %s: %s.\n", id, err)
 		os.Exit(1)
 	}
-	if err := driver.Remove(image.ID); err != nil {
-		fmt.Printf("Failed to remove %s: %s\n", id, err)
+	if err := g.Delete(image.ID); err != nil {
+		fmt.Printf("Failed to delete %s: %s\n", id, err)
 		os.Exit(1)
 	}
 }
@@ -28,9 +28,9 @@ func remove(c *cli.Context) {
 func init() {
 	commands = append(commands,
 		cli.Command{
-			Name:      "remove",
-			ShortName: "r",
-			Usage:     "remove storage for id",
-			Action:    remove,
+			Name:      "delete",
+			ShortName: "d",
+			Usage:     "delete an image",
+			Action:    deleteImage,
 		})
 }
