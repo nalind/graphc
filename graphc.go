@@ -8,6 +8,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/daemon"
 	"github.com/docker/docker/daemon/events"
 	"github.com/docker/docker/daemon/graphdriver"
 	"github.com/docker/docker/graph"
@@ -71,7 +72,7 @@ func initRegistry() *registry.Service {
 	return registry.NewService(nil)
 }
 
-func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
+func initTagStoreAndConfig(c *cli.Context) (*graph.TagStore, *graph.TagStoreConfig, *graph.Graph, graphdriver.Driver) {
 	g, d := initGraph(c)
 	tsfile := filepath.Join(c.GlobalString("home"), "repositories-"+d.String())
 	e := events.New()
@@ -86,7 +87,26 @@ func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Dr
 		fmt.Printf("Failed to instantiate tag store: %s\n", err)
 		os.Exit(1)
 	}
+	return t, &config, g, d
+}
+
+func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Driver) {
+	t, _, g, d := initTagStoreAndConfig(c)
 	return t, g, d
+}
+
+func initDaemon(c *cli.Context) (*daemon.Daemon, *graph.TagStore, *graph.Graph, graphdriver.Driver) {
+	t, tc, g, d := initTagStoreAndConfig(c)
+	config := &daemon.Config{}
+	config.GraphDriver = c.GlobalString("driver")
+	config.Root = c.GlobalString("home")
+	config.GraphOptions = c.GlobalStringSlice("storage-opt")
+	daemon, err := daemon.NewDaemon(config, tc.Registry)
+	if err != nil {
+		fmt.Printf("Failed to instantiate daemon: %s\n", err)
+		os.Exit(1)
+	}
+	return daemon, t, g, d
 }
 
 func lookupID(s *graph.TagStore, name string) string {
