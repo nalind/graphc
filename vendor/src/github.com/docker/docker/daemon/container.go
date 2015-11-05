@@ -328,10 +328,6 @@ func (streamConfig *streamConfig) StderrPipe() io.ReadCloser {
 	return ioutils.NewBufReader(reader)
 }
 
-func (container *Container) isNetworkAllocated() bool {
-	return container.NetworkSettings.IPAddress != ""
-}
-
 // cleanup releases any network resources allocated to the container along with any rules
 // around how containers are linked together.  It also unmounts the container's root filesystem.
 func (container *Container) cleanup() {
@@ -721,6 +717,8 @@ func (container *Container) getLogger() (logger.Logger, error) {
 		ContainerImageID:    container.ImageID,
 		ContainerImageName:  container.Config.Image,
 		ContainerCreated:    container.Created,
+		ContainerEnv:        container.Config.Env,
+		ContainerLabels:     container.Config.Labels,
 	}
 
 	// Set logging file for "json-logger"

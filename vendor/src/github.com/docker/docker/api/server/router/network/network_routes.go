@@ -11,7 +11,9 @@ import (
 	"github.com/docker/docker/api/server/httputils"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/daemon"
+	"github.com/docker/docker/daemon/network"
 	"github.com/docker/docker/pkg/parsers/filters"
+	"github.com/docker/docker/runconfig"
 	"github.com/docker/libnetwork"
 )
 
@@ -84,6 +86,11 @@ func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWr
 		return err
 	}
 
+	if runconfig.IsPreDefinedNetwork(create.Name) {
+		return httputils.WriteJSON(w, http.StatusForbidden,
+			fmt.Sprintf("%s is a pre-defined network and cannot be created", create.Name))
+	}
+
 	nw, err := n.daemon.GetNetwork(create.Name, daemon.NetworkByName)
 	if _, ok := err.(libnetwork.ErrNoSuchNetwork); err != nil && !ok {
 		return err
@@ -95,7 +102,7 @@ func (n *networkRouter) postNetworkCreate(ctx context.Context, w http.ResponseWr
 		warning = fmt.Sprintf("Network with name %s (id : %s) already exists", nw.Name(), nw.ID())
 	}
 
-	nw, err = n.daemon.CreateNetwork(create.Name, create.Driver, create.Options)
+	nw, err = n.daemon.CreateNetwork(create.Name, create.Driver, create.IPAM, create.Options)
 	if err != nil {
 		return err
 	}
@@ -168,6 +175,11 @@ func (n *networkRouter) deleteNetwork(ctx context.Context, w http.ResponseWriter
 		return err
 	}
 
+	if runconfig.IsPreDefinedNetwork(nw.Name()) {
+		return httputils.WriteJSON(w, http.StatusForbidden,
+			fmt.Sprintf("%s is a pre-defined network and cannot be removed", nw.Name()))
+	}
+
 	return nw.Delete()
 }
 
@@ -179,8 +191,12 @@ func buildNetworkResource(nw libnetwork.Network) *types.NetworkResource {
 
 	r.Name = nw.Name()
 	r.ID = nw.ID()
+	r.Scope = nw.Info().Scope()
 	r.Driver = nw.Type()
+	r.Options = nw.Info().DriverOptions()
 	r.Containers = make(map[string]types.EndpointResource)
+	buildIpamResources(r, nw)
+
 	epl := nw.Endpoints()
 	for _, e := range epl {
 		sb := e.Info().Sandbox()
@@ -191,6 +207,31 @@ func buildNetworkResource(nw libnetwork.Network) *types.NetworkResource {
 		r.Containers[sb.ContainerID()] = buildEndpointResource(e)
 	}
 	return r
+}
+
+func buildIpamResources(r *types.NetworkResource, nw libnetwork.Network) {
+	id, ipv4conf, ipv6conf := nw.Info().IpamConfig()
+
+	r.IPAM.Driver = id
+
+	r.IPAM.Config = []network.IPAMConfig{}
+	for _, ip4 := range ipv4conf {
+		iData := network.IPAMConfig{}
+		iData.Subnet = ip4.PreferredPool
+		iData.IPRange = ip4.SubPool
+		iData.Gateway = ip4.Gateway
+		iData.AuxAddress = ip4.AuxAddresses
+		r.IPAM.Config = append(r.IPAM.Config, iData)
+	}
+
+	for _, ip6 := range ipv6conf {
+		iData := network.IPAMConfig{}
+		iData.Subnet = ip6.PreferredPool
+		iData.IPRange = ip6.SubPool
+		iData.Gateway = ip6.Gateway
+		iData.AuxAddress = ip6.AuxAddresses
+		r.IPAM.Config = append(r.IPAM.Config, iData)
+	}
 }
 
 func buildEndpointResource(e libnetwork.Endpoint) types.EndpointResource {
@@ -204,12 +245,12 @@ func buildEndpointResource(e libnetwork.Endpoint) types.EndpointResource {
 		if mac := iface.MacAddress(); mac != nil {
 			er.MacAddress = mac.String()
 		}
-		if ip := iface.Address(); len(ip.IP) > 0 {
-			er.IPv4Address = (&ip).String()
+		if ip := iface.Address(); ip != nil && len(ip.IP) > 0 {
+			er.IPv4Address = ip.String()
 		}
 
-		if ipv6 := iface.AddressIPv6(); len(ipv6.IP) > 0 {
-			er.IPv6Address = (&ipv6).String()
+		if ipv6 := iface.AddressIPv6(); ipv6 != nil && len(ipv6.IP) > 0 {
+			er.IPv6Address = ipv6.String()
 		}
 	}
 	return er

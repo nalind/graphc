@@ -2,10 +2,12 @@ package daemon
 
 import (
 	"errors"
+	"fmt"
+	"net"
 	"strings"
 
+	"github.com/docker/docker/daemon/network"
 	"github.com/docker/libnetwork"
-	"github.com/docker/libnetwork/netlabel"
 )
 
 const (
@@ -14,6 +16,12 @@ const (
 	// NetworkByName represents a constant to find a network by its Name
 	NetworkByName
 )
+
+// NetworkControllerEnabled checks if the networking stack is enabled.
+// This feature depends on OS primitives and it's dissabled in systems like Windows.
+func (daemon *Daemon) NetworkControllerEnabled() bool {
+	return daemon.netController != nil
+}
 
 // FindNetwork function finds a network for a given string that can represent network name or id
 func (daemon *Daemon) FindNetwork(idName string) (libnetwork.Network, error) {
@@ -78,29 +86,42 @@ func (daemon *Daemon) GetNetworksByID(partialID string) []libnetwork.Network {
 }
 
 // CreateNetwork creates a network with the given name, driver and other optional parameters
-func (daemon *Daemon) CreateNetwork(name, driver string, options map[string]interface{}) (libnetwork.Network, error) {
+func (daemon *Daemon) CreateNetwork(name, driver string, ipam network.IPAM, options map[string]string) (libnetwork.Network, error) {
 	c := daemon.netController
 	if driver == "" {
 		driver = c.Config().Daemon.DefaultDriver
 	}
 
-	if options == nil {
-		options = make(map[string]interface{})
-	}
-	_, ok := options[netlabel.GenericData]
-	if !ok {
-		options[netlabel.GenericData] = make(map[string]interface{})
+	nwOptions := []libnetwork.NetworkOption{}
+
+	v4Conf, v6Conf, err := getIpamConfig(ipam.Config)
+	if err != nil {
+		return nil, err
 	}
 
-	return c.NewNetwork(driver, name, parseOptions(options)...)
+	nwOptions = append(nwOptions, libnetwork.NetworkOptionIpam(ipam.Driver, "", v4Conf, v6Conf))
+	nwOptions = append(nwOptions, libnetwork.NetworkOptionDriverOpts(options))
+	return c.NewNetwork(driver, name, nwOptions...)
 }
 
-func parseOptions(options map[string]interface{}) []libnetwork.NetworkOption {
-	var setFctList []libnetwork.NetworkOption
-
-	if options != nil {
-		setFctList = append(setFctList, libnetwork.NetworkOptionGeneric(options))
+func getIpamConfig(data []network.IPAMConfig) ([]*libnetwork.IpamConf, []*libnetwork.IpamConf, error) {
+	ipamV4Cfg := []*libnetwork.IpamConf{}
+	ipamV6Cfg := []*libnetwork.IpamConf{}
+	for _, d := range data {
+		iCfg := libnetwork.IpamConf{}
+		iCfg.PreferredPool = d.Subnet
+		iCfg.SubPool = d.IPRange
+		iCfg.Gateway = d.Gateway
+		iCfg.AuxAddresses = d.AuxAddress
+		ip, _, err := net.ParseCIDR(d.Subnet)
+		if err != nil {
+			return nil, nil, fmt.Errorf("Invalid subnet %s : %v", d.Subnet, err)
+		}
+		if ip.To4() != nil {
+			ipamV4Cfg = append(ipamV4Cfg, &iCfg)
+		} else {
+			ipamV6Cfg = append(ipamV6Cfg, &iCfg)
+		}
 	}
-
-	return setFctList
+	return ipamV4Cfg, ipamV6Cfg, nil
 }

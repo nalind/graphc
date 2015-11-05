@@ -173,6 +173,7 @@ Create a container
              "MemorySwap": 0,
              "CpuShares": 512,
              "CpuPeriod": 100000,
+             "CpuQuota": 50000,
              "CpusetCpus": "0,1",
              "CpusetMems": "0,1",
              "BlkioWeight": 300,
@@ -216,11 +217,12 @@ Json Parameters:
       for the container.
 -   **User** - A string value specifying the user inside the container.
 -   **Memory** - Memory limit in bytes.
--   **MemorySwap**- Total memory limit (memory + swap); set `-1` to disable swap
+-   **MemorySwap** - Total memory limit (memory + swap); set `-1` to disable swap
       You must use this with `memory` and make the swap value larger than `memory`.
 -   **CpuShares** - An integer value containing the container's CPU Shares
       (ie. the relative weight vs other containers).
 -   **CpuPeriod** - The length of a CPU period in microseconds.
+-   **CpuQuota** - Microseconds of CPU time that the container can get in a CPU period.
 -   **Cpuset** - Deprecated please don't use. Use `CpusetCpus` instead. 
 -   **CpusetCpus** - String value containing the `cgroups CpusetCpus` to use.
 -   **CpusetMems** - Memory nodes (MEMs) in which to allow execution (0-3, 0,1). Only effective on NUMA systems.
@@ -1341,6 +1343,8 @@ Query Parameters:
 -   **memswap** - Total memory (memory + swap), `-1` to disable swap.
 -   **cpushares** - CPU shares (relative weight).
 -   **cpusetcpus** - CPUs in which to allow execution (e.g., `0-3`, `0,1`).
+-   **cpuperiod** - The length of a CPU period in microseconds.
+-   **cpuquota** - Microseconds of CPU time that the container can get in a CPU period.
 
     Request Headers:
 
@@ -2137,12 +2141,12 @@ Status Codes:
 
 `POST /exec/(id)/resize`
 
-Resizes the `tty` session used by the `exec` command `id`.
+Resizes the `tty` session used by the `exec` command `id`.  The unit is number of characters.
 This API is valid only if `tty` was specified as part of creating and starting the `exec` command.
 
 **Example request**:
 
-    POST /exec/e90e34656806/resize HTTP/1.1
+    POST /exec/e90e34656806/resize?h=40&w=80 HTTP/1.1
     Content-Type: text/plain
 
 **Example response**:
@@ -2253,7 +2257,7 @@ Return low-level information about the `exec` command `id`.
         "ProcessLabel" : "",
         "AppArmorProfile" : "",
         "RestartCount" : 0,
-        "Mounts" : [],
+        "Mounts" : []
       }
     }
 

@@ -29,12 +29,21 @@ driver stores the following metadata in the journal with each message:
 You can configure the default logging driver by passing the
 `--log-driver` option to the Docker daemon:
 
-    docker --log-driver=journald
+    docker daemon --log-driver=journald
 
 You can set the logging driver for a specific container by using the
 `--log-driver` option to `docker run`:
 
     docker run --log-driver=journald ...
+
+## Options
+
+Users can use the `--log-opt NAME=VALUE` flag to specify additional
+journald logging driver options.
+
+### labels and env
+
+The `labels` and `env` options each take a comma-separated list of keys. If there is collision between `label` and `env` keys, the value of the `env` takes precedence. Both options add additional metadata in the journal with each message.
 
 ## Note regarding container names
 
@@ -74,4 +83,3 @@ logs:
 
     for msg in reader:
       print '{CONTAINER_ID_FULL}: {MESSAGE}'.format(**msg)
-

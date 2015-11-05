@@ -8,6 +8,7 @@ docker-inspect - Return low-level information on a container or image
 **docker inspect**
 [**--help**]
 [**-f**|**--format**[=*FORMAT*]]
+[**-s**|**--size**[=*false*]]
 [**--type**=*container*|*image*]
 CONTAINER|IMAGE [CONTAINER|IMAGE...]
 
@@ -25,13 +26,16 @@ each result.
 **-f**, **--format**=""
     Format the output using the given Go template.
 
+**-s**, **--size**=false
+    Display total file sizes if the type is container.
+
 **--type**=*container*|*image*
     Return JSON for specified type, permissible values are "image" or "container"
 
 # EXAMPLES
 
-Getting information on an image where image name conflict with the container name,
-e,g both image and container are named rhel7.
+Get information about an image when image name conflicts with the container name,
+e.g. both image and container are named rhel7:
 
     $ docker inspect --type=image rhel7
     [
@@ -190,7 +194,7 @@ To get information on a container use its ID or instance name:
 
 To get the IP address of a container use:
 
-    $ docker inspect --format='{{.NetworkSettings.IPAddress}}' d2cc496561d6
+    $ docker inspect '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' d2cc496561d6
     172.17.0.2
 
 ## Listing all port bindings
@@ -205,10 +209,22 @@ output:
 You can get more information about how to write a Go template from:
 https://golang.org/pkg/text/template/.
 
+## Getting size information on an container
+
+    $ docker inspect -s d2cc496561d6
+    [
+    {
+    ....
+    "SizeRw": 0,
+    "SizeRootFs": 972,
+    ....
+    }
+    ]
+
 ## Getting information on an image
 
 Use an image's ID or name (e.g., repository/name[:tag]) to get information
-on it.
+about the image:
 
     $ docker inspect ded7cd95e059
     [{
@@ -289,3 +305,4 @@ April 2014, originally compiled by William Henry (whenry at redhat dot com)
 based on docker.com source material and internal work.
 June 2014, updated by Sven Dowideit <SvenDowideit@home.org.au>
 April 2015, updated by Qiang Huang <h.huangqiang@huawei.com>
+October 2015, updated by Sally O'Malley <somalley@redhat.com>

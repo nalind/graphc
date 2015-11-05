@@ -116,7 +116,7 @@ complete -c docker -A -f -n '__fish_seen_subcommand_from cp' -l help -d 'Print u
 complete -c docker -f -n '__fish_docker_no_subcommand' -a create -d 'Create a new container'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s a -l attach -d 'Attach to STDIN, STDOUT or STDERR.'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l add-host -d 'Add a custom host-to-IP mapping (host:ip)'
-complete -c docker -A -f -n '__fish_seen_subcommand_from create' -s c -l cpu-shares -d 'CPU shares (relative weight)'
+complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cpu-shares -d 'CPU shares (relative weight)'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cap-add -d 'Add Linux capabilities'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cap-drop -d 'Drop Linux capabilities'
 complete -c docker -A -f -n '__fish_seen_subcommand_from create' -l cidfile -d 'Write the container ID to the file'
@@ -207,6 +207,7 @@ complete -c docker -f -n '__fish_docker_no_subcommand' -a info -d 'Display syste
 complete -c docker -f -n '__fish_docker_no_subcommand' -a inspect -d 'Return low-level information on a container or image'
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -s f -l format -d 'Format the output using the given go template.'
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -l help -d 'Print usage'
+complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -s s -l size -d 'Display total file sizes if the type is container.'
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -a '(__fish_print_docker_images)' -d "Image"
 complete -c docker -A -f -n '__fish_seen_subcommand_from inspect' -a '(__fish_print_docker_containers all)' -d "Container"
 

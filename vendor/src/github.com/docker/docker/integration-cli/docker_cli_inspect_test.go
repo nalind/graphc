@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/pkg/integration/checker"
 	"github.com/docker/docker/runconfig"
 	"github.com/go-check/check"
 )
@@ -27,13 +28,9 @@ func (s *DockerSuite) TestInspectImage(c *check.C) {
 
 func (s *DockerSuite) TestInspectInt64(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	out, _, err := dockerCmdWithError("run", "-d", "-m=300M", "busybox", "true")
-	if err != nil {
-		c.Fatalf("failed to run container: %v, output: %q", err, out)
-	}
-	out = strings.TrimSpace(out)
 
-	inspectOut, err := inspectField(out, "HostConfig.Memory")
+	dockerCmd(c, "run", "-d", "-m=300M", "--name", "inspectTest", "busybox", "true")
+	inspectOut, err := inspectField("inspectTest", "HostConfig.Memory")
 	c.Assert(err, check.IsNil)
 
 	if inspectOut != "314572800" {
@@ -91,7 +88,7 @@ func (s *DockerSuite) TestInspectTypeFlagContainer(c *check.C) {
 
 	dockerCmd(c, "run", "--name=busybox", "-d", "busybox", "top")
 
-	formatStr := fmt.Sprintf("--format='{{.State.Running}}'")
+	formatStr := "--format='{{.State.Running}}'"
 	out, exitCode, err := dockerCmdWithError("inspect", "--type=container", formatStr, "busybox")
 	if exitCode != 0 || err != nil {
 		c.Fatalf("failed to inspect container: %s, %v", out, err)
@@ -344,4 +341,51 @@ func (s *DockerSuite) TestInspectLogConfigNoType(c *check.C) {
 
 	c.Assert(logConfig.Type, check.Equals, "json-file")
 	c.Assert(logConfig.Config["max-file"], check.Equals, "42", check.Commentf("%v", logConfig))
+}
+
+func (s *DockerSuite) TestInspectNoSizeFlagContainer(c *check.C) {
+
+	//Both the container and image are named busybox. docker inspect will fetch container
+	//JSON SizeRw and SizeRootFs field. If there is no flag --size/-s, there are no size fields.
+
+	dockerCmd(c, "run", "--name=busybox", "-d", "busybox", "top")
+
+	formatStr := "--format='{{.SizeRw}},{{.SizeRootFs}}'"
+	out, _ := dockerCmd(c, "inspect", "--type=container", formatStr, "busybox")
+	c.Assert(strings.TrimSpace(out), check.Equals, "<nil>,<nil>", check.Commentf("Exepcted not to display size info: %s", out))
+}
+
+func (s *DockerSuite) TestInspectSizeFlagContainer(c *check.C) {
+	dockerCmd(c, "run", "--name=busybox", "-d", "busybox", "top")
+
+	formatStr := "--format='{{.SizeRw}},{{.SizeRootFs}}'"
+	out, _ := dockerCmd(c, "inspect", "-s", "--type=container", formatStr, "busybox")
+	sz := strings.Split(out, ",")
+
+	c.Assert(strings.TrimSpace(sz[0]), check.Not(check.Equals), "<nil>")
+	c.Assert(strings.TrimSpace(sz[1]), check.Not(check.Equals), "<nil>")
+}
+
+func (s *DockerSuite) TestInspectSizeFlagImage(c *check.C) {
+	dockerCmd(c, "run", "--name=busybox", "-d", "busybox", "top")
+
+	formatStr := "--format='{{.SizeRw}},{{.SizeRootFs}}'"
+	out, _, err := dockerCmdWithError("inspect", "-s", "--type=image", formatStr, "busybox")
+
+	// Template error rather than <no value>
+	// This is a more correct behavior because images don't have sizes associated.
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(out, checker.Contains, "Template parsing error")
+}
+
+func (s *DockerSuite) TestInspectTempateError(c *check.C) {
+	//Both the container and image are named busybox. docker inspect will fetch container
+	//JSON State.Running field. If the field is true, it's a container.
+
+	dockerCmd(c, "run", "--name=busybox", "-d", "busybox", "top")
+
+	out, _, err := dockerCmdWithError("inspect", "--type=container", "--format='Format container: {{.ThisDoesNotExist}}'", "busybox")
+
+	c.Assert(err, check.Not(check.IsNil))
+	c.Assert(out, checker.Contains, "Template parsing error")
 }
