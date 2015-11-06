@@ -14,6 +14,7 @@ import (
 	"github.com/docker/docker/graph"
 	"github.com/docker/docker/image"
 	_ "github.com/docker/docker/pkg/chrootarchive"
+	"github.com/docker/docker/pkg/mflag"
 	"github.com/docker/docker/pkg/parsers"
 	"github.com/docker/docker/pkg/reexec"
 	"github.com/docker/docker/registry"
@@ -98,9 +99,14 @@ func initTagStore(c *cli.Context) (*graph.TagStore, *graph.Graph, graphdriver.Dr
 func initDaemon(c *cli.Context) (*daemon.Daemon, *graph.TagStore, *graph.Graph, graphdriver.Driver) {
 	t, tc, g, d := initTagStoreAndConfig(c)
 	config := &daemon.Config{}
+	config.DisableBridge = true
 	config.GraphDriver = c.GlobalString("driver")
-	config.Root = c.GlobalString("home")
 	config.GraphOptions = c.GlobalStringSlice("storage-opt")
+	home := c.GlobalString("home")
+	config.Root = home
+	config.TrustKeyPath = filepath.Join(c.GlobalString("configdir"), "key.json")
+	flags := mflag.NewFlagSet("graphc", mflag.ExitOnError)
+	config.InstallFlags(flags, func(string) string { return "" })
 	daemon, err := daemon.NewDaemon(config, tc.Registry)
 	if err != nil {
 		fmt.Printf("Failed to instantiate daemon: %s\n", err)
@@ -179,9 +185,14 @@ func main() {
 	graphc.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "home",
-			Value:  "/var/lib/docker/",
+			Value:  "/var/lib/docker",
 			Usage:  "home directory for graphdriver storage operations",
 			EnvVar: "GRAPHDRIVER_HOME",
+		},
+		cli.StringFlag{
+			Name:  "configdir",
+			Value: "/etc/docker",
+			Usage: "directory for docker configuration",
 		},
 		cli.StringFlag{
 			Name:   "storage-driver, driver, s",
